@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/soundCircle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/bottom"
+            android:layout_gravity="center">
+
+            <View
+                android:id="@+id/soundRipple2"
+                android:layout_width="230dp"
+                android:layout_height="230dp"
+                android:background="@drawable/demo_rider"
+                android:layout_centerInParent="true"/>
+            <View
+                android:id="@+id/soundRipple3"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:background="@drawable/demo_rider"
+                android:alpha="0.08"
+                android:layout_centerInParent="true"/>
+
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/demo_user"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/todo" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:padding="20dp"
+            android:background="@color/black_trans"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/map_pin"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/todo" />
+
+                <View
+                    android:layout_width="15dp"
+                    android:layout_height="5dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="18dp"
+                        android:fontFamily="@font/roboto"
+                        android:textFontWeight="600"
+                        android:textColor="@color/text_white"
+                        android:layout_marginBottom="3dp"
+                        android:text="@string/destination"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16dp"
+                        android:fontFamily="@font/roboto"
+                        android:textColor="@color/color_f2"
+                        android:text="@string/location_text"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/task_cancel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="5dp"
+                    android:textAllCaps="false"
+                    android:fontFamily="@font/roboto"
+                    android:textColor="@color/text_white"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="15dp"
+                    android:letterSpacing="0"
+                    android:backgroundTint="@color/black"
+                    android:text="Cancel" />
+
+                <Button
+                    android:id="@+id/task_accept"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/roboto"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:padding="15dp"
+                    android:letterSpacing="0"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@color/text_white"
+                    android:backgroundTint="@color/purple_500"
+                    android:textAllCaps="false"
+                    android:text="View Tasks" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">CS24 Rider</string>
+    <string name="sign_in">Sign In</string>
+    <string name="todo">todo</string>
+    <string name="email">Email</string>
+    <string name="demo_email">rider1</string>
+    <string name="demo_password">123456</string>
+    <string name="otp">One Time Password</string>
+    <string name="fg_pass">Forgot Password</string>
+    <string name="password">Password</string>
+    <string name="cmf_password">Confirm Password</string>
+    <string name="otp_msg">We already send an OTP code for change your password. Please checkout your email and get otp code and submit that code for verify your account.</string>
+    <string name="remaining_time">Remaining time</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="MAP_API_KEY">AIzaSyAhu3tzIXYRtiVCUB7sa3FeA8p7YiK_kPo</string>
+    <string name="demo_user_name">Hamd Khan</string>
+    <string name="destination">Destination</string>
+    <string name="location_text">1st floor, building no 7, Jinnah Ave, New York</string>
+    <string name="pickup_point">Pickup Point</string>
+    <string name="online">Online</string>
+    <string name="requests">🚚 3 new delivery requests!</string>
+    <string name="requests_desc">There are 3 new delivery requests in your area</string>
+    <string name="notification">notification</string>
+    <string name="profile">Profile</string>
+    <string name="home">Home</string>
+    <string name="more">VIEW MORE</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello">Hello!</string>
+</resources>

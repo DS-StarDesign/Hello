@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "770987437315",
+    "firebase_url": "https://cs24-rider-4a61e-default-rtdb.firebaseio.com",
+    "project_id": "cs24-rider-4a61e",
+    "storage_bucket": "cs24-rider-4a61e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770987437315:android:6e71aca1a4c389ff408d36",
+        "android_client_info": {
+          "package_name": "ds.app.cs24rider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "770987437315-h1d031a56b7h94kih3uul4htnmufiv1j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUNYyq8F0QYbGYF2_I7tWlNmsOCNjRVRU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "770987437315-h1d031a56b7h94kih3uul4htnmufiv1j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
