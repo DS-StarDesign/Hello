@@ -36,10 +36,15 @@ public class TaskPlaceActivityQuery extends AbstractInteractor {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
+                    String data = null;
+                    for (DataSnapshot snapshot1:snapshot.getChildren()){
+                        data = snapshot1.child("pickup_point").getValue().toString();
+                    }
+                    String finalData = data;
                     mMainThread.post(new Runnable() {
                         @Override
                         public void run() {
-                            mCallBack.onResponse(true, snapshot.getValue().toString());
+                            mCallBack.onResponse(true, finalData);
                         }
                     });
                 }
@@ -50,5 +55,28 @@ public class TaskPlaceActivityQuery extends AbstractInteractor {
                 mCallBack.onResponse(false, error.getMessage());
             }
         });
+    }
+
+    class TmpData {
+        private String pickup_point;
+        private Long timestamp;
+
+        public TmpData() {}
+
+        public String getPickup_point() {
+            return pickup_point;
+        }
+
+        public void setPickup_point(String pickup_point) {
+            this.pickup_point = pickup_point;
+        }
+
+        public Long getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(Long timestamp) {
+            this.timestamp = timestamp;
+        }
     }
 }

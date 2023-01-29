@@ -18,8 +18,8 @@
     <string name="location_text">1st floor, building no 7, Jinnah Ave, New York</string>
     <string name="pickup_point">Pickup Point</string>
     <string name="online">Online</string>
-    <string name="requests">🚚 3 new delivery requests!</string>
-    <string name="requests_desc">There are 3 new delivery requests in your area</string>
+    <string name="requests">🚚</string>
+    <string name="requests_desc">new delivery requests in your area</string>
     <string name="notification">notification</string>
     <string name="profile">Profile</string>
     <string name="home">Home</string>
@@ -27,4 +27,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hello">Hello!</string>
+    <string name="end_ride">End Ride</string>
+    <string name="receiver_confirmation">Receiver Confirmation</string>
+    <string name="otp_description">Please get the OTP from the receiver then enter the OTP for confirmation is product received or not.</string>
+    <string name="offline">"offline"</string>
 </resources>

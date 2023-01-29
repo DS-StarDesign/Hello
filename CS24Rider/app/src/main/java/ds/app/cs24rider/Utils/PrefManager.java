@@ -13,6 +13,9 @@ public class PrefManager {
 
     public static final String sPrefManagerName = "ds_app_cs24rider";
     public static final String ACCESS_TOKEN = "access_token";
+    public static final String RUNNING_TASK_INVOICE_ID = "running_task_invoice_id";
+    public static final String CANCEL_TASK_INVOICE_ID = "cancel_task_invoice_id";
+    public static final String IS_ONLINE = "is_online";
 
     private final SharedPreferences mSharedPreferences;
     private static PrefManager sPrefManager;

@@ -47,7 +47,9 @@ public class MainApplication extends MultiDexApplication implements MyLocationUp
                     }
                 });
         mPresenter = new LocationUpdateBusiness(this, this);
-        mPresenter.getTaskChange();
+        if(PrefManager.getInstance(this).isLoggedIn()){
+            mPresenter.getTaskChange();
+        }
     }
 
     public static synchronized MainApplication getInstance() {
@@ -57,7 +59,7 @@ public class MainApplication extends MultiDexApplication implements MyLocationUp
     @Override
     public void onResponse(boolean status, String message) {
         if(isFirstTime){
-            sendBroadcast(new Intent().setAction(Constance.ON_TASK_CHANGE).putExtra("status", status));
+            sendBroadcast(new Intent().setAction(Constance.ON_TASK_CHANGE).putExtra("status", status).putExtra("pickup", message));
         }else{
             isFirstTime = true;
         }

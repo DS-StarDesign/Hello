@@ -4,7 +4,7 @@ package ds.app.cs24rider.Utils;
  *  DEWAN SOFTWARE LTD.
  * */
 public class Constance {
-    public static final String BASE_URL = "http://192.168.0.101/Services/api/"; //"http://courierservice24.com/mobile_api/api/";
+    public static final String BASE_URL = "http://courierservice24.com/mobile_api/api/"; //"http://192.168.0.101/Services/api/";
     public static final String MAP_API_URL = "https://maps.googleapis.com/maps/api/";
     public static final String EMAIL = "Email";
     public static final String USERNAME = "username";
@@ -29,4 +29,6 @@ public class Constance {
 
     /*Broadcast*/
     public static final String ON_TASK_CHANGE = "change_task_response";
+    public static final String CALL = "call";
+    public static final String MSG = "message";
 }

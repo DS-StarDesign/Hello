@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -57,13 +58,15 @@ public class CallingDialog extends Dialog {
         });
     }
 
-    public Dialog show(boolean cancelable){
+    public Dialog show(boolean cancelable, String pickup){
         dialog = new CallingDialog(getContext());
         View view = LayoutInflater.from(getContext()).inflate(R.layout.call_screen, null);
         Button cancel = view.findViewById(R.id.task_cancel);
         Button accept = view.findViewById(R.id.task_accept);
         View circle1 = view.findViewById(R.id.soundRipple2);
         View circle2 = view.findViewById(R.id.soundRipple3);
+        TextView pickupAddress = view.findViewById(R.id.pickup_address);
+        pickupAddress.setText(pickup);
 
         Animation pulse = AnimationUtils.loadAnimation(getContext(), R.anim.pulse);
         Animation pulse2 = AnimationUtils.loadAnimation(getContext(), R.anim.pulse);

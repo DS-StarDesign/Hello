@@ -206,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onResponse(boolean status, String message) {
+        Log.e("dkdkjfgkj", message);
         isResponse = true;
     }
 
@@ -224,8 +225,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private BroadcastReceiver taskChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent != null && intent.hasExtra("status") && isActive){
-                dialog.show(false);
+            if(intent != null && intent.hasExtra("status") && intent.hasExtra("pickup") && isActive){
+                if(!dialog.isShowing()){
+                    dialog.show(false, intent.getStringExtra("pickup"));
+                }
             }
         }
     };

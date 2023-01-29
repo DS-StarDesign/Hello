@@ -2,13 +2,13 @@ package ds.app.cs24rider.Views.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,12 +23,13 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -48,7 +49,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -59,25 +59,41 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONException;
 
-import ds.app.cs24rider.Businesses.Maps.LocationUpdateBusiness;
-import ds.app.cs24rider.CallBack.Presenters.MyLocationUpdatePresenter;
+import java.util.ArrayList;
+import java.util.List;
+
+import ds.app.cs24rider.Businesses.Maps.MapDirectionBusiness;
+import ds.app.cs24rider.CallBack.Presenters.MapDirectionPresenter;
 import ds.app.cs24rider.CallBack.RouteSetupCallback;
 import ds.app.cs24rider.Models.Maps.MapDirection;
+import ds.app.cs24rider.Models.Tasks.TasksModel;
 import ds.app.cs24rider.R;
 import ds.app.cs24rider.Utils.CallingDialog;
 import ds.app.cs24rider.Utils.Constance;
-import ds.app.cs24rider.Views.Home.MainActivity;
+import ds.app.cs24rider.Utils.OTPConfirmationDialog;
+import ds.app.cs24rider.Utils.PrefManager;
 import ds.app.cs24rider.databinding.ActivityMapsBinding;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, RouteSetupCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, RouteSetupCallback, MapDirectionPresenter.View{
 
+    private static final int REQUEST_CODE = 250;
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     protected LocationManager locationManager;
     private ImageView taskList, locator;
     private TaskListSheet bottomSheet;
+    private CardView notification, endRideView;
+    private ImageView callBtn, msgBtn;
+    private ImageView notificationClose;
+    private TextView notificationTitle, notificationSubTitle, rcvName, onOff;
+    private Button taskComplete;
+    private LinearLayout onlineOffline;
+    private List<TasksModel> items = new ArrayList<>();
+    private MapDirectionPresenter mPresenter;
+    private PrefManager mPref;
 
     MarkerOptions myMarkerOptions = null;
     Marker myPos = null;
@@ -85,9 +101,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private static final int REQUEST_CHECK_SETTINGS = 10001;
     private Double latitude = 23.8103, longitude = 90.4125;
+    private String MAP_KEY;
 
     public String tasks;
     private CallingDialog dialog;
+    OTPConfirmationDialog otpDialog;
+
+    private List<MapDirection> mapDirections = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +124,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         permission_request(false);
+        this.MAP_KEY = getResources().getString(R.string.MAP_API_KEY);
+        this.mPresenter = new MapDirectionBusiness(this, this);
         init();
         dialog = new CallingDialog(this);
+        otpDialog = new OTPConfirmationDialog(this);
     }
 
     private void permission_request(boolean type){
@@ -131,21 +154,129 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void init(){
-        taskList = findViewById(R.id.my_task_list);
         locator = findViewById(R.id.my_locator);
+        notification = findViewById(R.id.map_notification);
+        endRideView = findViewById(R.id.end_ride_view);
+        notificationClose = findViewById(R.id.map_notification_close);
+        taskList = findViewById(R.id.my_task_list);
+        notificationTitle = findViewById(R.id.map_notification_title);
+        notificationSubTitle = findViewById(R.id.map_notification_sub_title);
+        rcvName = findViewById(R.id.receiver_name);
+        taskComplete = findViewById(R.id.task_complete);
+        callBtn = findViewById(R.id.call_btn);
+        msgBtn = findViewById(R.id.msg_btn);
+        onOff = findViewById(R.id.online_offline_text);
+        onlineOffline = findViewById(R.id.online_offline);
+        callBtn.setOnClickListener(view -> {
+            String inID = mPref.getString(PrefManager.RUNNING_TASK_INVOICE_ID);
+            if(!inID.isEmpty() && items.size() > 0){
+                for (TasksModel model:items){
+                    if(inID.equalsIgnoreCase(model.getInId())){
+                        contact(Constance.CALL, model.getRcvMobile());
+                        break;
+                    }
+                }
+            }
+        });
+        msgBtn.setOnClickListener(view -> {
+            String inID = mPref.getString(PrefManager.RUNNING_TASK_INVOICE_ID);
+            if(!inID.isEmpty() && items.size() > 0){
+                for (TasksModel model:items){
+                    if(inID.equalsIgnoreCase(model.getInId())){
+                        contact(Constance.MSG, model.getRcvMobile());
+                        break;
+                    }
+                }
+            }
+        });
+        mPref = PrefManager.getInstance(this);
+        showOnOff();
+        if(!tasks.isEmpty()) {
+            try {
+                JSONArray array = new JSONArray(tasks);
+                for (int i = 0; i < array.length(); i++) {
+                    items.add(new TasksModel().prepare(array.getJSONObject(i)));
+                    String destination = items.get(i).getStartLat().concat(", ").concat(items.get(i).getStartLong());
+                    String origin = items.get(i).getLatitude().concat(", ").concat(items.get(i).getLongitude());
+                    mPresenter.loadDirections(destination, origin, "driving", MAP_KEY);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            bottomSheet = new TaskListSheet(this, items, mapDirections);
+            if(!mPref.getString(PrefManager.RUNNING_TASK_INVOICE_ID).equalsIgnoreCase(items.get(0).getInId())) {
+                bottomSheet.show(getSupportFragmentManager(), "task_list");
+                notification.setVisibility(View.VISIBLE);
+            }else{
+                if(items.size() > 0){
+                    openEndRideView();
+                }
+            }
+        }
         taskList.setOnClickListener(view->{
             bottomSheet.show(getSupportFragmentManager(), "task_list");
         });
         locator.setOnClickListener(view->{
             permission_request(true);
         });
-        taskList.setVisibility(tasks.isEmpty() ? View.GONE : View.VISIBLE);
-        if(!tasks.isEmpty()){
-            bottomSheet = new TaskListSheet(this, tasks);
+        notification.setOnClickListener(view -> {
             bottomSheet.show(getSupportFragmentManager(), "task_list");
-        }
+            notification.setVisibility(View.GONE);
+        });
+        notificationClose.setOnClickListener(view -> {
+            notification.setVisibility(View.GONE);
+        });
+        taskComplete.setOnClickListener(view -> {
+            String id = mPref.getString(PrefManager.RUNNING_TASK_INVOICE_ID);
+            String taskID = mPref.getString(PrefManager.RUNNING_TASK_INVOICE_ID);
+            String mobile = mPref.getString(PrefManager.RUNNING_TASK_INVOICE_ID);
+            for (TasksModel item:items){
+                if(id.equalsIgnoreCase(item.getInId())){
+                    taskID = item.getId();
+                    mobile = item.getRcvMobile();
+                    break;
+                }
+            }
+            mPresenter.sendOtp(taskID, mobile);
+        });
+        onlineOffline.setOnClickListener(view -> {
+            setOnOff();
+        });
+        notificationTitle.setText(notificationTitle.getText().toString().concat(" ").concat(String.valueOf(items.size())).concat(" new delivery requests!"));
+        notificationSubTitle.setText("There are ".concat(String.valueOf(items.size())).concat(" ").concat(notificationSubTitle.getText().toString()));
+        taskList.setVisibility(tasks.isEmpty() ? View.GONE : View.VISIBLE);
         IntentFilter onUpChat = new IntentFilter(); onUpChat.addAction(Constance.ON_TASK_CHANGE);
         registerReceiver(taskChangeReceiver, onUpChat);
+    }
+
+    private void showOnOff() {
+        if(mPref.getBoolean(PrefManager.IS_ONLINE)){
+            onlineOffline.setBackground(getResources().getDrawable(R.drawable.btn_circle_back));
+            onOff.setText(getResources().getString(R.string.online));
+        }else{
+            onlineOffline.setBackground(getResources().getDrawable(R.drawable.btn_circle_back2));
+            onOff.setText(getResources().getString(R.string.offline));
+        }
+    }
+
+    private void setOnOff() {
+        mPref.putBoolean(PrefManager.IS_ONLINE, !mPref.getBoolean(PrefManager.IS_ONLINE));
+        showOnOff();
+    }
+
+    private void openOTPConfirmationDialog() {
+        if(!otpDialog.isShowing()){
+            otpDialog.show(false, this);
+        }
+    }
+
+    private void openEndRideView() {
+        endRideView.setVisibility(View.VISIBLE);
+        for(TasksModel model : items){
+            if(model.getInId().equalsIgnoreCase(mPref.getString(PrefManager.RUNNING_TASK_INVOICE_ID))){
+                rcvName.setText(model.getRcvName());
+            }
+        }
     }
 
     private void open_location(){
@@ -195,7 +326,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         open_location();
         if(myLatLong != null){
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLong, 15));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLong, 20));
         }
     }
 
@@ -239,6 +370,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onLoad(MapDirection response) {
+        if(items.size() != mapDirections.size()){
+            mapDirections.add(response);
+        }
         PolylineOptions lineOptions = new PolylineOptions();
         ArrayList<LatLng> allPoints = response.getPoints();
         lineOptions.addAll(allPoints);
@@ -246,21 +380,113 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         lineOptions.color(Color.RED);
         lineOptions.geodesic(true);
         mMap.addPolyline(lineOptions);
+        mMap.addMarker(new MarkerOptions().position(new LatLng(response.getLatitudePickup(), response.getLongitudePickup())).title("Pickup"));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(response.getLatitudeDestination(), response.getLongitudeDestination())).title("Delivery Point."));
+        zoomOnTargetView(response);
+    }
+
+    private void zoomOnTargetView(MapDirection response) {
         LatLngBounds bounds = new LatLngBounds.Builder()
                 .include(new LatLng(response.getLatitudePickup(), response.getLongitudePickup()))
                 .include(new LatLng(response.getLatitudeDestination(), response.getLongitudeDestination())).build();
         Point point = new Point();
         getWindowManager().getDefaultDisplay().getSize(point);
-        mMap.addMarker(new MarkerOptions().position(new LatLng(response.getLatitudePickup(), response.getLongitudePickup())).title("Pickup"));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(response.getLatitudeDestination(), response.getLongitudeDestination())).title("Delivery Point."));
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 850, 30));
+    }
+
+    @Override
+    public void onStartRide(int id) {
+        if(items.size() > id){
+            items.get(id).setActivity(2);
+            permission_request(true);
+            if(bottomSheet != null){
+                bottomSheet.dismiss();
+                openEndRideView();
+            }
+        }
+    }
+
+    @Override
+    public void movieCamera(int position) {
+        if(position < mapDirections.size()){
+            onLoad(mapDirections.get(position));
+        }
+    }
+
+    @Override
+    public void contact(String call, String mobile) {
+        if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, REQUEST_CODE);
+        } else {
+            if(Constance.CALL.equalsIgnoreCase(call)){
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mobile));
+                startActivity(intent);
+            }
+            if(Constance.MSG.equalsIgnoreCase(call)){
+                Uri uri = Uri.parse("smsto:"+mobile);
+                Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+                intent.putExtra("sms_body", "Hello CS24 Rider.");
+                startActivity(intent);
+            }
+        }
+    }
+
+    @Override
+    public void onSuccess(MapDirection response) {
+        onLoad(response);
+    }
+
+    @Override
+    public void onFailed(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onOtpSubmit(String s) {
+        String id = mPref.getString(PrefManager.RUNNING_TASK_INVOICE_ID);
+        String taskID = "";
+        for (TasksModel item:items){
+            if(id.equalsIgnoreCase(item.getInId())){
+                taskID = item.getId();
+                break;
+            }
+        }
+        mPresenter.checkOtp(taskID, s);
+    }
+
+    @Override
+    public void onOtpSend() {
+        openOTPConfirmationDialog();
+    }
+
+    @Override
+    public void onOtpSendFailed(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void taskCompleteFailed(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void taskCompleted() {
+        endRideView.setVisibility(View.GONE);
+        for (TasksModel model : items){
+            if(model.getInId().equalsIgnoreCase(mPref.getString(PrefManager.RUNNING_TASK_INVOICE_ID))){
+                model.setActivity(3);
+            }
+        }
+        otpDialog.dismissNow();
     }
 
     private BroadcastReceiver taskChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent != null && intent.hasExtra("status")){
-                dialog.show(false);
+            if(intent != null && intent.hasExtra("status") && intent.hasExtra("pickup")){
+                if(!dialog.isShowing()){
+                    dialog.show(false,  intent.getStringExtra("pickup"));
+                }
             }
         }
     };

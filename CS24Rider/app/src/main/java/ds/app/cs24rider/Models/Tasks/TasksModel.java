@@ -34,10 +34,22 @@ public class TasksModel {
     @SerializedName("start_long")
     private String startLong;
 
-    public TasksModel() {
-    }
+    @SerializedName("timestamp")
+    private Long timestamp;
 
-    public TasksModel(String id, String orderID, String riderId, String inId, String address, String latitude, String longitude, String startLat, String startLong) {
+    @SerializedName("activity")
+    private int activity;
+
+    @SerializedName("pickup_address")
+    private String pickupAddress;
+
+    @SerializedName("receiver_name")
+    private String rcvName;
+
+    @SerializedName("rcv_mobile")
+    private String rcvMobile;
+
+    public TasksModel(String id, String orderID, String riderId, String inId, String address, String latitude, String longitude, String startLat, String startLong, Long timestamp, int activity, String pickupAddress, String rcvName, String rcvMobile) {
         this.id = id;
         this.orderID = orderID;
         this.riderId = riderId;
@@ -47,6 +59,22 @@ public class TasksModel {
         this.longitude = longitude;
         this.startLat = startLat;
         this.startLong = startLong;
+        this.timestamp = timestamp;
+        this.activity = activity;
+        this.pickupAddress = pickupAddress;
+        this.rcvName = rcvName;
+        this.rcvMobile = rcvMobile;
+    }
+
+    public TasksModel() {
+    }
+
+    public String getRcvName() {
+        return rcvName;
+    }
+
+    public void setRcvName(String rcvName) {
+        this.rcvName = rcvName;
     }
 
     public String getId() {
@@ -121,6 +149,38 @@ public class TasksModel {
         this.startLong = startLong;
     }
 
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public int getActivity() {
+        return activity;
+    }
+
+    public void setActivity(int activity) {
+        this.activity = activity;
+    }
+
+    public String getPickupAddress() {
+        return pickupAddress;
+    }
+
+    public void setPickupAddress(String pickupAddress) {
+        this.pickupAddress = pickupAddress;
+    }
+
+    public String getRcvMobile() {
+        return rcvMobile;
+    }
+
+    public void setRcvMobile(String rcvMobile) {
+        this.rcvMobile = rcvMobile;
+    }
+
     public String getJsonString(){
         String result = "{";
         result = result.concat("\"id\":").concat(getId() == null ? "\"\"" : "\""+getId()+"\"").concat(",");
@@ -131,7 +191,12 @@ public class TasksModel {
         result = result.concat("\"latitude\":").concat(getLatitude() == null ? "\"\"" : "\""+getLatitude()+"\"").concat(",");
         result = result.concat("\"longitude\":").concat(getLongitude() == null ? "\"\"" : "\""+getLongitude()+"\"").concat(",");
         result = result.concat("\"start_lat\":").concat(getStartLat() == null ? "\"\"" : "\""+getStartLat()+"\"").concat(",");
-        result = result.concat("\"start_long\":").concat(getStartLong() == null ? "\"\"" : "\""+getStartLong()+"\"");
+        result = result.concat("\"start_long\":").concat(getStartLong() == null ? "\"\"" : "\""+getStartLong()+"\"").concat(",");
+        result = result.concat("\"timestamp\":").concat(getTimestamp() == null ? "\"\"" : "\""+getTimestamp()+"\"").concat(",");
+        result = result.concat("\"activity\":").concat(getActivity() < 0 ? "\"\"" : "\""+getActivity()+"\"").concat(",");
+        result = result.concat("\"receiver_name\":").concat(getRcvName() == null ? "\"\"" : "\""+getRcvName()+"\"").concat(",");
+        result = result.concat("\"rcv_mobile\":").concat(getRcvMobile() == null ? "\"\"" : "\""+getRcvMobile()+"\"").concat(",");
+        result = result.concat("\"pickup_address\":").concat(getPickupAddress() == null ? "\"\"" : "\""+getPickupAddress()+"\"");
         return result.concat("}");
     }
 
@@ -147,6 +212,11 @@ public class TasksModel {
             model.setLongitude(o.getString("longitude"));
             model.setStartLat(o.getString("start_lat"));
             model.setStartLong(o.getString("start_long"));
+            model.setActivity(o.getInt("activity"));
+            model.setPickupAddress(o.getString("pickup_address"));
+            model.setRcvName(o.getString("receiver_name"));
+            model.setRcvMobile(o.getString("rcv_mobile"));
+            model.setTimestamp(o.getLong("timestamp"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

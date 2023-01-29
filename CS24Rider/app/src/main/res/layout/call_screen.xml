@@ -79,9 +79,10 @@
                         android:textFontWeight="600"
                         android:textColor="@color/text_white"
                         android:layout_marginBottom="3dp"
-                        android:text="@string/destination"/>
+                        android:text="@string/pickup_point"/>
 
                     <TextView
+                        android:id="@+id/pickup_address"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="16dp"
